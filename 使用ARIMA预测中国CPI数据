@@ -1,0 +1,26 @@
+#使用ARIMA预测中国CPI数据，
+CPI<-read.csv("这里应该是你的CPI文件地址cnCPI-7q1.csv")
+library(forecast)
+library(ggpubr)
+cpi<-(CPI$CPI.)#留意你的CPI数据的列名有没有加个"."
+t<-(CPI$t)
+fit<-arima(cpi,order=c(2,1,1))
+fcast<-forecast(fit, xreg=rep(mean(cpi),8))
+autoplot(fcast) + xlab("月份") +
+  ylab("cpi") +
+  ggtitle("中国CPI月度数据")+
+  theme(text = element_text(family = "serif"))+
+  theme(plot.title = element_text(hjust = 0.5))
+fit2 <- auto.arima(cpi, d=1)
+fc2 <- forecast(fit2, h=10)
+autoplot(fcast) +
+  autolayer(fc2, series="随机趋势") + 
+  ggtitle("随机趋势模型的而预测结果") +
+  xlab("序数") + ylab("中国CPI月度数据") +
+  guides(colour=guide_legend(title="模型趋势"))+
+  theme(text = element_text(family = "serif"))+
+  theme(plot.title = element_text(hjust = 0.5))
+checkresiduals(fit2)
+checkresiduals(fit)
+summary(fit2)
+summary(fit)
